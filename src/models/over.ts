@@ -1,27 +1,41 @@
 import { Batsman } from './batsman';
 
 export class Over {
-    index: number;
+    over: number;
     bowler: string;
-    batsman1: Batsman = new Batsman();
-    batsman2: Batsman = new Batsman();
+    batsmen: Batsman[] = [ new Batsman(), new Batsman()];
 
-    wickets: number = 0;
-    runs: number = 0;
-    extras: number = 0;
-    wides: number = 0;
-    legside: number = 0;
-    noBalls: number = 0;
-    stumps: number = 0;
-    bowled: number = 0;
-    catches: number = 0;
-    mancad: number = 0;
-    runout: number = 0;
-    ballCount: number = 0;
+    wickets: number;
+    runs: number;
+    extras: number;
+    wides: number;
+    legside: number;
+    noBalls: number;
+    stumps: number;
+    bowled: number;
+    catches: number;
+    mancad: number;
+    runout: number;
+    ballCount: number;
     balls: string[] = [];
-
     
     constructor(init?: Partial<Over>) {
         Object.assign(this, init);
     }
+
+        public initialize(): void {
+
+            this.wickets = 0;
+            this.runs = 0;
+            this.extras = 0;
+            this.wides = 0;
+            this.legside = 0;
+            this.noBalls = 0;
+            this.stumps = 0;
+            this.bowled = 0;
+            this.catches = 0;
+            this.mancad = 0;
+            this.runout = 0;
+            this.ballCount = 0;
+        }
 }

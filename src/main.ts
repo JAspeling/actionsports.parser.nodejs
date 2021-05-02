@@ -1,13 +1,13 @@
-import express from "express";
-import { IScoresheetParser } from './models/parser.interface';
-import * as routes from './routes/routes'
+import express from 'express';
+
+import * as routes from './routes/routes';
 
 export class Main {
     private app = express();
     private port: number = 8080;
 
-
     constructor() {
+        this.app.use(express.urlencoded({ extended: false }));
         this.app.use(express.json());
     }
 

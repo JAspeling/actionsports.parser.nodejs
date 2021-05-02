@@ -1,13 +1,13 @@
 import { Innings } from './innings';
-import { Over } from './over';
-import { Team } from './team';
+import { SkinData } from './skin';
 
 export class Scoresheet {
+    skinsData: SkinData[] = [];
 
-    teams: Team[] = [];
-
-    innings1: Innings = new Innings();
-    innings2: Innings = new Innings();
+    innings: Innings[] = [
+        new Innings(),
+        new Innings()
+    ];
 
     constructor(init?: Partial<Scoresheet>) {
         Object.assign(this, init);

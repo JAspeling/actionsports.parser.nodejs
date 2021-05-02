@@ -3,18 +3,27 @@ import { Bowler } from './bowler';
 export class Batsman {
     name: string;
     balls: string[] = [];
-    score: number = 0;
+    score: number;
 
-    faced: number = 0;
-    extras: number = 0;
+    faced: number;
+    extras: number;
 
-    wickets: number = 0;
+    wickets: number;
 
-    strikeRate: number = 0;
+    strikeRate: number;
 
-    bowlers: Bowler[];
+    bowlers: Bowler[] = [];
     
     constructor(init?: Partial<Batsman>) {
         Object.assign(this, init);
+    }
+
+    initialize(): void {
+        this.score = 0;
+        this.faced = 0;
+        this.extras = 0;
+
+        this.wickets = 0;
+        this.strikeRate = 0;
     }
 }

@@ -6,17 +6,17 @@ export const scoresheet = (app: express.Application) => {
 
     const parser: IScoresheetParser = new ScoresheetParser();
 
-    // home page    
-    app.get("/scoresheet/*", (req, res) => {
+    app.post("/parse", (req, res) => {
 
         // const url: string = 'https://actionsport.spawtz.com/Leagues/IndoorCricket/Scoresheet.aspx?FixtureId=1801555';
-        const url = req.originalUrl.replace('/scoresheet/', '');
 
-        
+        const body = req.body;
+        const url = body.url;
+
         parser.parse(url).then(scoresheet => {
             res.send({ code: 200, data: scoresheet });
         }).catch(err => {
-            res.send('Error parsing scoresheet');
+            res.send({ code: 500, data: 'Error parsing scoresheet', error: err });
         });
 
     });

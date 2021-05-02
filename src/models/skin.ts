@@ -6,3 +6,12 @@ export class Skin {
     state: 'win' | 'draw' | 'lose';
     points: number;
 }
+
+export class SkinData {
+    team: string;
+    skins: number[] = [];
+    
+    constructor(init?: Partial<SkinData>) {
+        Object.assign(this, init);
+    }
+}

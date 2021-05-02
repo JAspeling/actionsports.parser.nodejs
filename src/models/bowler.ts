@@ -1,12 +1,19 @@
 export class Bowler {
     name: string;
     balls: string[] = [];
-    score: number = 0;
-    extras: number = 0;
+    score: number;
+    extras: number;
 
-    wickets: number = 0;
+    wickets: number;
 
     constructor(init?: Partial<Bowler>) {
         Object.assign(this, init);
+    }
+
+    public initialize() {
+
+        this.score = 0;
+        this.extras = 0;
+        this.wickets = 0;
     }
 }

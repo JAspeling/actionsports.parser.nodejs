@@ -2,9 +2,9 @@
     "name": "pr",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
-        "start": "node ./src/index.js",
+        "start": "tsc && node dist/index.js",
         "dev": "nodemon --config nodemon.json src/index.ts",
         "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts"
     },

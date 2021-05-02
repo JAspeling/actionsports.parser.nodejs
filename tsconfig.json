@@ -6,6 +6,9 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "dist",
         "typeRoots": [
             "node_modules/@types"
         ],
@@ -13,6 +16,9 @@
             "node"
         ]
     },
+    "lib": [
+        "ES2019"
+    ],
     "include": [
         "src/**/*"
     ],

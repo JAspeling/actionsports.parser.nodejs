@@ -16,11 +16,18 @@ export class ScoresheetParser implements IScoresheetParser {
 
     public parse(url: string): Promise<Scoresheet> {
 
+        // const urlParams = new URLSearchParams(url);
+        const _url = new URL(url);
+        const params = new URLSearchParams(_url.search);
+        
+        this.scoresheet.fixtureId = params.get('FixtureId');
+
         return new Promise((resolve, reject) => {
             got(url).then(response => {
                 this.dom = new JSDOM(response.body);
 
                 try {
+                    this.validate();
                     this.parseSkins();
 
                     this.parseInnings(0);
@@ -32,11 +39,19 @@ export class ScoresheetParser implements IScoresheetParser {
                 }
 
             }).catch(err => {
-                console.log(err);
+                reject(err);
             });
         })
     }
 
+    private validate(): void {
+        var found = this.dom.window.document.querySelector('.Summary');
+
+        if (!found) {
+            throw new CustomError('Invalid scoresheet url');
+        }
+    }
+    
     private parseSkins(): void {
         try {
             this.scoresheet.skinsData.push(this.parseSkinData(2));

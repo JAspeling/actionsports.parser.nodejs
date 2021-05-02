@@ -22,6 +22,6 @@ export class Main {
     }
 
     private registerRoutes(): void {
-        routes.scoresheet(this.app);
+        routes.parse(this.app);
     }
 }

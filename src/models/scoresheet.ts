@@ -3,6 +3,7 @@ import { SkinData } from './skin';
 
 export class Scoresheet {
     skinsData: SkinData[] = [];
+    fixtureId: string;
 
     innings: Innings[] = [
         new Innings(),

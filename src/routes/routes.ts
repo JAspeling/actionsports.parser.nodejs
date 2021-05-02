@@ -2,7 +2,7 @@ import * as express from "express";
 import { IScoresheetParser } from '../models/parser.interface';
 import { ScoresheetParser } from '../models/scoresheet.parser';
 
-export const scoresheet = (app: express.Application) => {
+export const parse = (app: express.Application) => {
 
     const parser: IScoresheetParser = new ScoresheetParser();
 
@@ -19,10 +19,5 @@ export const scoresheet = (app: express.Application) => {
             res.send({ code: 500, data: 'Error parsing scoresheet', error: err });
         });
 
-    });
-
-    // about page    
-    app.get("/about", (req: any, res) => {
-        res.send({ code: 200, data: "/ABOUT Works" })
     });
 };

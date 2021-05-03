@@ -11,51 +11,51 @@ const got = require('got');
 const jsdom = require("jsdom");
 
 export class ScoresheetParser implements IScoresheetParser {
-    dom: JSDOM;
-    scoresheet = new Scoresheet();
 
     public parse(url: string): Promise<Scoresheet> {
 
+
+        let scoresheet = new Scoresheet();
         // const urlParams = new URLSearchParams(url);
         const _url = new URL(url);
         const params = new URLSearchParams(_url.search);
-        
-        this.scoresheet.fixtureId = params.get('FixtureId');
+
+        scoresheet.fixtureId = params.get('FixtureId');
 
         return new Promise((resolve, reject) => {
             got(url).then(response => {
-                this.dom = new JSDOM(response.body);
+                const dom = new JSDOM(response.body);
 
                 try {
-                    this.validate();
-                    this.parseSkins();
+                    this.validate(dom);
+                    this.parseSkins(dom, scoresheet);
 
-                    this.parseInnings(0);
-                    this.parseInnings(1);
+                    this.parseInnings(dom, scoresheet, 0);
+                    this.parseInnings(dom, scoresheet, 1);
 
-                    resolve(this.scoresheet);
+                    resolve(scoresheet);
                 } catch (error) {
                     reject(error);
                 }
 
             }).catch(err => {
-                reject(err);
+                reject(err.message);
             });
         })
     }
 
-    private validate(): void {
-        var found = this.dom.window.document.querySelector('.Summary');
+    private validate(dom: JSDOM): void {
+        var found = dom.window.document.querySelector('.Summary');
 
         if (!found) {
             throw new CustomError('Invalid scoresheet url');
         }
     }
-    
-    private parseSkins(): void {
+
+    private parseSkins(dom: JSDOM, scoresheet: Scoresheet): void {
         try {
-            this.scoresheet.skinsData.push(this.parseSkinData(2));
-            this.scoresheet.skinsData.push(this.parseSkinData(3));
+            scoresheet.skinsData.push(dom, this.parseSkinData(dom, 2));
+            scoresheet.skinsData.push(dom, this.parseSkinData(dom, 3));
         } catch (error) {
             throw new CustomError('Failed to parse the skins section.', error);
         }
@@ -66,14 +66,14 @@ export class ScoresheetParser implements IScoresheetParser {
      * @param rowIndex The index on the table for the current team.
      * @returns 
      */
-    private parseSkinData(rowIndex: number): SkinData {
+    private parseSkinData(dom: JSDOM, rowIndex: number): SkinData {
         try {
             const result = new SkinData({
-                team: this.parseTeamName(rowIndex)
+                team: this.parseTeamName(dom, rowIndex)
             });
 
             for (let index = 1; index <= 4; index++) {
-                const score: string = this.dom.window.document.querySelectorAll('.Summary>tbody>tr')[rowIndex].querySelectorAll('td')[index].innerHTML;
+                const score: string = dom.window.document.querySelectorAll('.Summary>tbody>tr')[rowIndex].querySelectorAll('td')[index].innerHTML;
                 result.skins.push(+score);
             }
 
@@ -89,9 +89,9 @@ export class ScoresheetParser implements IScoresheetParser {
      * @param rowIndex 
      * @returns 
      */
-    private parseTeamName(rowIndex: number): string {
+    private parseTeamName(dom: JSDOM, rowIndex: number): string {
         try {
-            return this.dom.window.document.querySelectorAll('.Summary>tbody>tr')[rowIndex].querySelectorAll('td')[0].innerHTML;
+            return dom.window.document.querySelectorAll('.Summary>tbody>tr')[rowIndex].querySelectorAll('td')[0].innerHTML;
         } catch (error) {
             throw new CustomError(`Could not parse the team name for index ${rowIndex}`, error);
         }
@@ -102,17 +102,17 @@ export class ScoresheetParser implements IScoresheetParser {
      * @param scoresheet The scoresheet to add the information to
      * @param inningsIndex The index of the innings
      */
-    private parseInnings(inningsIndex: number): void {
+    private parseInnings(dom: JSDOM, scoresheet: Scoresheet, inningsIndex: number): void {
         try {
-            const inningsTable: HTMLTableElement = this.dom.window.document.querySelectorAll('.OversTable')[inningsIndex];
-            this.parseBowlers(inningsTable, inningsIndex);
-            this.parseBatting(inningsTable, inningsIndex);
+            const inningsTable: HTMLTableElement = dom.window.document.querySelectorAll('.OversTable')[inningsIndex];
+            this.parseBowlers(scoresheet, inningsTable, inningsIndex);
+            this.parseBatting(scoresheet, inningsTable, inningsIndex);
         } catch (error) {
             throw new CustomError(`Could not parse the innings for index ${inningsIndex}`, error);
         }
     }
 
-    private parseBowlers(inningsTable: HTMLTableElement, inningsIndex: number): void {
+    private parseBowlers(scoresheet: Scoresheet, inningsTable: HTMLTableElement, inningsIndex: number): void {
         // These are the rows containing the following information on the BOWLERS:
         // Over index
         // Bowler name.
@@ -147,17 +147,17 @@ export class ScoresheetParser implements IScoresheetParser {
             }
         }
 
-        this.scoresheet.innings[inningsIndex].overs.push(...overs);
+        scoresheet.innings[inningsIndex].overs.push(...overs);
     }
 
-    private parseBatting(inningsTable: HTMLTableElement, inningsIndex: number): void {
+    private parseBatting(scoresheet: Scoresheet, inningsTable: HTMLTableElement, inningsIndex: number): void {
         const batsmanRows: NodeListOf<HTMLTableRowElement> = inningsTable.querySelectorAll('tbody>tr.BallRow');
 
         // This will toggle between 1 and 2.
         let batsmanIndex: number = 1;
         let overIndex: number = 0;
         // let newOver = true;
-        let overs = this.scoresheet.innings[inningsIndex].overs;
+        let overs = scoresheet.innings[inningsIndex].overs;
         let ballIndex: number = 0;
 
         // Iterate over all the batters
